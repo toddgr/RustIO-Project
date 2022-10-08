@@ -1,4 +1,5 @@
 use std::env;
+use std::fs;
 
 fn main() {
     // Args will panic if any argument contains invalid Unicode.
@@ -11,4 +12,10 @@ fn main() {
 
     println!("Searching for {}", query);
     println!("In file {}", file_path);
+
+    // Read the contents of a file
+    let contents = fs::read_to_string(file_path)
+    .expect("Failed to read file");
+
+    println!("With text: \n{contents}"); // Print text
 }
