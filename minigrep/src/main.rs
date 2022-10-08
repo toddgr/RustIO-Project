@@ -1,5 +1,7 @@
 use std::env;
-use std::fs;
+use std::process;
+
+use minigrep::Config;
 
 fn main() {
     // Args will panic if any argument contains invalid Unicode.
@@ -7,15 +9,18 @@ fn main() {
     // Unicode, use std::env::args_os instead
     let args: Vec<String> = env::args().collect();
     
-    let query = &args[1];
-    let file_path = &args[2];
+    let config = Config::build(&args).unwrap_or_else(|err| {
+        println!("Problem parsing arguments: {err}");
+        process::exit(1);
+    });
 
-    println!("Searching for {}", query);
-    println!("In file {}", file_path);
+    println!("Searching for {}", config.query);
+    println!("In file {}", config.file_path);
 
-    // Read the contents of a file
-    let contents = fs::read_to_string(file_path)
-    .expect("Failed to read file");
+    if let Err(e) = minigrep::run(config) {
+        println!("Application error: {e}");
+        process::exit(1);
+    }
 
-    println!("With text: \n{contents}"); // Print text
 }
+
