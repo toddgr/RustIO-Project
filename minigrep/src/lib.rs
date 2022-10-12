@@ -53,17 +53,53 @@ pub fn search<'a>(query: &str, contents: &'a str) -> Vec<&'a str> {
 }
 
 
+// Return the line in the input file, not sensitive to lower case
+pub fn search_case_insensitive<'a>(
+    query: &str,
+    contents: &'a str,
+) -> Vec<&'a str> {
+    let query = query.to_lowercase();
+    let mut results = Vec::new();
+
+    for line in contents.lines() {
+        if line.to_lowercase().contains(&query) {
+            results.push(line);
+        }
+    }
+
+    results
+}
+
+
 #[cfg(test)]
 mod tests{
     use super::*;
 
     #[test]
-    fn one_result() {
+    fn case_insensitive() {
+        // Does the program return lines regardless of the letter cases?
+        let query = "rUsT";
+        let contents = "\
+Rust:
+safe, fast, productive.
+Pick three.
+Trust me.";
+        assert_eq!(
+            vec!["Rust:", "Trust me."],
+            search_case_insensitive(query, contents)
+        );
+    }
+
+
+    #[test]
+    fn case_sensitive() {
+        // Does the program only return the line with the correct casing?
         let query = "duct";
         let contents = "\
 Rust:
 safe, fast, productive.
-Pick three.";
+Pick three.
+Duct tape.";
         assert_eq!(vec!["safe, fast, productive."], search(query, contents));
     }
 }
